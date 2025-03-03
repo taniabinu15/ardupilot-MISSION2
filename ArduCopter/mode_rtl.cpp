@@ -1,4 +1,7 @@
 #include "Copter.h"
+#define COUCH_PARK_LAT 33.77828262281893
+#define COUCH_PARK_LNG -84.4027972157204
+#define COUCH_PARK_ALT 0
 
 #if MODE_RTL_ENABLED
 
@@ -400,13 +403,10 @@ void ModeRTL::build_path()
 //   return target's altitude is updated to a higher altitude that the vehicle can safely return at (frame may also be set)
 void ModeRTL::compute_return_target()
 {
-    // set return target to nearest rally point or home position
-#if HAL_RALLY_ENABLED
-    rtl_path.return_target = copter.rally.calc_best_rally_or_home_location(copter.current_loc, ahrs.get_home().alt);
-    rtl_path.return_target.change_alt_frame(Location::AltFrame::ABSOLUTE);
-#else
-    rtl_path.return_target = ahrs.get_home();
-#endif
+    rtl_path.return_target.lat = COUCH_PARK_LAT * 1.0e7;
+    rtl_path.return_target.lng = COUCH_PARK_LNG * 1.0e7;
+    rtl_path.return_target.alt = COUCH_PARK_ALT;
+    rtl_path.return_target.set_alt_frame(Location::AltFrame::ABOVEHOME);
 
     // get position controller Z-axis offset in cm above EKF origin
     int32_t pos_offset_z = pos_control->get_pos_offset_z_cm();
